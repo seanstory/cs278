@@ -23,11 +23,13 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 
-public class SMSManagerImpl implements SMSManager {
+public class SMSManagerImpl implements SMSManager, SMSSender {
 
 	private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 
 	private static final String MESSAGES = "pdus";
+	
+	private ArrayList<SMSListener> listeners = new ArrayList<SMSListener>();
 
 	public SMSManagerImpl(Context ctx){
 		
@@ -57,6 +59,11 @@ public class SMSManagerImpl implements SMSManager {
 					 * in a separate thread. 
 					 * 
 					 */
+					final SMS sms_ = new SMS();
+					sms_.setFrom(msg.getDisplayOriginatingAddress());
+					sms_.setContent(msg.getDisplayMessageBody());
+					received(sms_);
+					
 				}
 			}
 		}, f);
@@ -74,16 +81,19 @@ public class SMSManagerImpl implements SMSManager {
 	
 	@Override
 	public void addListener(SMSListener l) {
-		
+		listeners.add(l);
+		l.smsSenderAdded(this);
 	}
 
 	@Override
 	public void removeListener(SMSListener l) {
-
+		listeners.remove(l);
 	}
 	
 	public void received(SMS sms){
-
+		for (SMSListener l: listeners){
+			l.smsEvent(new SMSEvent(EVENT_TYPE.RECEIVE,sms));
+		}
 	}
 	
 	
@@ -101,6 +111,17 @@ public class SMSManagerImpl implements SMSManager {
 	public void sendSMS(SMS sms) {
 		SmsManager mgr = SmsManager.getDefault();
 		mgr.sendTextMessage(sms.getTo(), null, sms.getContent(), null, null);
+	}
+
+
+	@Override
+	@SodaAsync
+	public void send(String to, String msg) {
+		SMS sms = new SMS();
+		sms.setContent(msg);
+		sms.setTo(to);
+		sendSMS(sms);
+		
 	}
 
 }

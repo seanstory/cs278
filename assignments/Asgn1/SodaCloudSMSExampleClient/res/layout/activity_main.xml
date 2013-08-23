@@ -23,7 +23,7 @@
         android:layout_centerHorizontal="true"
         android:ems="10"
         android:hint="Server IP address"
-        android:text="Server IP address..." >
+        android:text="10.0.2.2" >
 
         <requestFocus />
     </EditText>
@@ -37,7 +37,7 @@
         android:layout_marginTop="17dp"
         android:ems="10"
         android:hint="Obj ref URI"
-        android:text="ObjRef..." />
+        android:text="soda://43517887-d71d-4819-a4a7-1cb053201367#1aac8b7b-32d7-42ba-8504-85d21af0d25c" />
 
     <Button
         android:id="@+id/scan"

@@ -17,7 +17,7 @@ public class QRCodeObjRefExtractor implements ObjRefExtractor {
 		 * 
 		 */
 		
-		return null;
+		return new MyExternalObjRef(oref,ref);
 	}
 
 }

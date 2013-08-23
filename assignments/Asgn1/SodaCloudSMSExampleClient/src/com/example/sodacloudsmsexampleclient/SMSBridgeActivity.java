@@ -38,11 +38,15 @@ public class SMSBridgeActivity extends Activity implements AndroidSodaListener {
 	 * ObjRefExtractor --> QRCodeObjRefExtractor
 	 * 
 	 */
-	private Module configuration_;
+	private MyModule mymod = new MyModule();
+	private Module configuration_ = mymod;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		configuration_.setComponent(SMSManager.class, new SMSManagerImpl(this));
+		configuration_.setComponent(ObjRefExtractor.class, new QRCodeObjRefExtractor());
+		
 		setContentView(R.layout.activity_smsbridge);
 
 		status_ = (TextView)findViewById(R.id.status);
