@@ -1,4 +1,3 @@
-cs27x
+Sean's CS278 Repository
 =====
-
-assignment 1 for  Vanderbilt's CS278
+All the homework files for CS278. Please find un-graded work in the origin/dev branch, in impl/Asgn#/*
