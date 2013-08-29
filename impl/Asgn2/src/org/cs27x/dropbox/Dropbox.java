@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import org.cs27x.filewatcher.DropboxFileEventHandler;
 import org.cs27x.filewatcher.FileReactor;
 import org.cs27x.filewatcher.FileStates;
+import org.cs27x.filewatcher.FileStatesInterface;
 
 public class Dropbox {
 
@@ -14,7 +15,7 @@ public class Dropbox {
 	private FileReactor reactor_;
 	
 	public Dropbox(Path rootdir){
-		FileStates states = new FileStates();
+		FileStatesInterface states = new FileStates();
 		reactor_ = new FileReactor(rootdir);
 		FileManager filemgr = new DefaultFileManager(rootdir);
 		transport_ = new HazelcastTransport();
