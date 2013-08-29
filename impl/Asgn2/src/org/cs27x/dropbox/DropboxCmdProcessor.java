@@ -6,14 +6,15 @@ import java.nio.file.Path;
 import org.cs27x.dropbox.DropboxCmd.OpCode;
 import org.cs27x.filewatcher.FileState;
 import org.cs27x.filewatcher.FileStates;
+import org.cs27x.filewatcher.FileStatesInterface;
 
 public class DropboxCmdProcessor implements DropboxTransportListener {
 
 	private final FileManager fileManager_;
 
-	private final FileStates fileStates_;
+	private final FileStatesInterface fileStates_;
 
-	public DropboxCmdProcessor(FileStates states, FileManager mgr) {
+	public DropboxCmdProcessor(FileStatesInterface states, FileManager mgr) {
 		super();
 		fileStates_ = states;
 		fileManager_ = mgr;

@@ -11,7 +11,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FileStates {
+public class FileStates implements FileStatesInterface {
 
 	private Map<String, FileState> states_ = new ConcurrentHashMap<>();
 
