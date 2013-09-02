@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import org.apache.commons.io.IOUtils;
 import org.cs27x.dropbox.DropboxCmd.OpCode;
 import org.cs27x.filewatcher.FileStates;
-import org.cs27x.filewatcher.FileStatesInterface;
 
 public class DropboxProtocol {
 
@@ -16,7 +15,7 @@ public class DropboxProtocol {
 	
 	private final DropboxCmdProcessor cmdProcessor_;
 
-	public DropboxProtocol(DropboxTransport transport, FileStatesInterface states, FileManager filemgr) {
+	public DropboxProtocol(DropboxTransport transport, FileStates states, FileManager filemgr) {
 		transport_ = transport;
 		cmdProcessor_ = new DropboxCmdProcessor(states,filemgr);
 		transport_.addListener(cmdProcessor_);

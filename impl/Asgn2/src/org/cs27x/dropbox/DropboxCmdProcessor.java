@@ -1,19 +1,17 @@
 package org.cs27x.dropbox;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 
 import org.cs27x.dropbox.DropboxCmd.OpCode;
 import org.cs27x.filewatcher.FileState;
 import org.cs27x.filewatcher.FileStates;
-import org.cs27x.filewatcher.FileStatesInterface;
 
 public class DropboxCmdProcessor implements DropboxTransportListener {
 
 	private final FileManager fileManager_;
 
-	private final FileStatesInterface fileStates_;
+	private final FileStates fileStates_;
 
 	public DropboxCmdProcessor(FileStates states, FileManager mgr) {
 		fileStates_ = states;
