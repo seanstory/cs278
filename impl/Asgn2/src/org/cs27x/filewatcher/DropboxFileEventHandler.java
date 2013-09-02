@@ -27,7 +27,7 @@ public class DropboxFileEventHandler implements FileEventHandler {
 	public void handle(FileEvent evt) {
 		Path p = evt.getFile();
 		p = fileHandler_.resolve(p.getFileName().toString());
-		evt = new FileEvent(evt.getEventType(), p);
+		evt = new FileEventImpl(evt.getEventType(), p);
 
 		try {
 			evt = fileStates_.filter(evt);

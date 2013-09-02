@@ -2,6 +2,7 @@ package org.cs27x.dropbox;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 
 import org.cs27x.dropbox.DropboxCmd.OpCode;
 import org.cs27x.filewatcher.FileState;
@@ -14,8 +15,7 @@ public class DropboxCmdProcessor implements DropboxTransportListener {
 
 	private final FileStatesInterface fileStates_;
 
-	public DropboxCmdProcessor(FileStatesInterface states, FileManager mgr) {
-		super();
+	public DropboxCmdProcessor(FileStates states, FileManager mgr) {
 		fileStates_ = states;
 		fileManager_ = mgr;
 	}
@@ -31,7 +31,7 @@ public class DropboxCmdProcessor implements DropboxTransportListener {
 					|| cmd.getOpCode() == OpCode.UPDATE) {
 				FileState state = fileStates_.getOrCreateState(resolved);
 				state.setSize(cmd.getData().length);
-				state.setLastModificationDate(Files
+				state.setLastModificationDate((FileTime) fileManager_
 						.getLastModifiedTime(resolved));
 			}
 		} catch (Exception e) {
@@ -45,10 +45,10 @@ public class DropboxCmdProcessor implements DropboxTransportListener {
 
 			Path resolved = fileManager_.resolve(cmd.getPath());
 			OpCode op = cmd.getOpCode();
-
 			if (op == OpCode.ADD || op == OpCode.UPDATE) {
 				fileManager_
 						.write(resolved, cmd.getData(), op == OpCode.UPDATE);
+			
 			} else if (op == OpCode.REMOVE) {
 				fileManager_.delete(resolved);
 			}

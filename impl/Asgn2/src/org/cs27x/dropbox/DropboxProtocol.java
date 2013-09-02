@@ -30,9 +30,17 @@ public class DropboxProtocol {
 		transport_.publish(cmd);
 	}
 
-	public void addFile(Path p) {
+	public DropboxCmd addFile(Path p){
+		return addOrUpdateFile(p, OpCode.ADD);
+	}
+	
+	public DropboxCmd updateFile(Path p){
+		return addOrUpdateFile(p, OpCode.UPDATE);
+	}
+	
+	private DropboxCmd addOrUpdateFile(Path p, OpCode oc) {
 		DropboxCmd cmd = new DropboxCmd();
-		cmd.setOpCode(OpCode.ADD);
+		cmd.setOpCode(oc);
 		cmd.setPath(p.getFileName().toString());
 
 		try {
@@ -47,32 +55,15 @@ public class DropboxProtocol {
 		}
 
 		publish(cmd);
+		return cmd;
 	}
 
-	public void removeFile(Path p) {
+	public DropboxCmd removeFile(Path p) {
 		DropboxCmd cmd = new DropboxCmd();
 		cmd.setOpCode(OpCode.REMOVE);
 		cmd.setPath(p.getFileName().toString());
 		publish(cmd);
+		return cmd;
 	}
-
-	public void updateFile(Path p) {
-		DropboxCmd cmd = new DropboxCmd();
-		cmd.setOpCode(OpCode.UPDATE);
-		cmd.setPath(p.getFileName().toString());
-		try {
-
-			try (InputStream in = Files.newInputStream(p)) {
-				byte[] data = IOUtils.toByteArray(in);
-				cmd.setData(data);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		publish(cmd);
-	}
-
 
 }

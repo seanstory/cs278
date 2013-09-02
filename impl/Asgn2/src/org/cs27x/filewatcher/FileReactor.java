@@ -118,7 +118,7 @@ public class FileReactor {
 			Path child = toWatch_.resolve(filename);
 
 			try {
-				FileEvent evt = new FileEvent(kind, child);
+				FileEvent evt = new FileEventImpl(kind, child);
 				dispatch(evt);
 			} catch (Exception e) {
 				e.printStackTrace();
