@@ -125,7 +125,7 @@ public class SMSReceiver extends BroadcastReceiver {
 				}
 				
 				if (curCommand != null){//command successfully found
-					curCommand.launchCommand(msg);
+					curCommand.launchCommand();
 				}
 			}
 

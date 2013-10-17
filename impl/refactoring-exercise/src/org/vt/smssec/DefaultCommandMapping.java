@@ -3,7 +3,7 @@ import java.util.HashMap;
 public class DefaultCommandMapping implements CmdMapping {
 
 
-	HashMap<String,Class<?>> map = new HashMap<String,Class<?>>();
+	HashMap<String,Class<? extends Command>> map = new HashMap<String,Class<? extends Command>>();
 	
 	public DefaultCommandMapping(){
 		map.put("say", TalkCommand.class);
@@ -13,13 +13,13 @@ public class DefaultCommandMapping implements CmdMapping {
 	}
 
 	@Override
-	public  Class<?> getCommand(String cmdString) {
+	public  Class<? extends Command> getCommand(String cmdString) {
 		
 		return  map.get(cmdString);
 	}
 
 	@Override
-	public void setCommand(String cmdString, Class<?> cmd) {
+	public void setCommand(String cmdString, Class<? extends Command> cmd) {
 		map.put(cmdString, cmd);
 	}
 

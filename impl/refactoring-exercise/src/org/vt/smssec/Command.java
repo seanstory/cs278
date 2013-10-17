@@ -13,6 +13,6 @@ public abstract class Command {
 		toastLength=tl;
 	}
 	
-	public abstract void launchCommand(String cmdString);
+	public abstract void launchCommand();
 
 }

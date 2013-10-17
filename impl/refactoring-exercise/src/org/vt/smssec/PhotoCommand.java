@@ -156,7 +156,7 @@ public class PhotoCommand extends Command {
 	}
 
 	@Override
-	public void launchCommand(String cmdString) {
+	public void launchCommand() {
 		speak();
 	}
 

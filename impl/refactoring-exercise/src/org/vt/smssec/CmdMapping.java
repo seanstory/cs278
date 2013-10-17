@@ -10,7 +10,7 @@ public interface CmdMapping {
 	 * @param type - type type of component to retrieve
 	 * @return
 	 */
-	public Class<?> getCommand(String cmdString);
+	public Class<? extends Command> getCommand(String cmdString);
 	
 	/**
 	 * 
@@ -19,6 +19,6 @@ public interface CmdMapping {
 	 * @param type - the type to bind the component to
 	 * @param component - the object instance to associate with the type key
 	 */
-	public  void setCommand(String cmdString, Class<?> cmd);
+	public  void setCommand(String cmdString, Class<? extends Command> cmd);
 	
 }

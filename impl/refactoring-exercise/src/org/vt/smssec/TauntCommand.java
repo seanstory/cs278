@@ -80,7 +80,7 @@ public class TauntCommand extends Command  {
 	}
 
 	@Override
-	public void launchCommand(String cmdString) {
+	public void launchCommand() {
 		sendTaunt();
 	}
 

@@ -70,7 +70,7 @@ public class TalkCommand extends Command implements OnInitListener {
 	}
 
 	@Override
-	public void launchCommand(String cmdString) {
+	public void launchCommand() {
 		speak();
 	}
 
