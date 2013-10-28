@@ -9,7 +9,6 @@ import java.nio.*;
 public class RDTReceiver {
     
     private DatagramSocket recvSocket_;
-    private DatagramPacket in_;
     private InetAddress senderIP_;
     private int senderport_;
     private String fileName_;
@@ -23,37 +22,40 @@ public class RDTReceiver {
 	public int recvData(byte[] buf, int length) throws IOException {
         //initialize varialbles for this receipt
 		byte[] buffer = new byte[buf.length + 2];//initialize the buffer for the full packet to be received
-        in_ = new DatagramPacket(buffer, buffer.length);//initialize the Datagram Packet
-        short ackno = -1;
+        DatagramPacket in = new DatagramPacket(buffer, buffer.length);//initialize the Datagram Packet
+        //short ackno = -1;
         byte[] ackbuf = new byte[2];
         
         //wait for - and then receive and store - the next packet
-        while (ackno != packetno_) {
-            recvSocket_.receive(in_);
-            
-            System.arraycopy(buffer, 0, ackbuf, 0, ackbuf.length);
-            ackno = ByteBuffer.wrap(ackbuf).getShort();//extract the value from the 2 bytes.
-            
-            //send an ack no matter what. 
-            DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length, senderIP_, senderport_);
-            recvSocket_.send(ack);
-        }
+       // while (ackno != packetno_) {
+        recvSocket_.receive(in);
+        setSender(in.getAddress(), in.getPort());
+        System.arraycopy(buffer, 0, ackbuf, 0, ackbuf.length);
+        short ackno = ByteBuffer.wrap(ackbuf).getShort();//extract the value from the 2 bytes.
+        
+        //send an ack no matter what. 
+        DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length, senderIP_, senderport_);
+        recvSocket_.send(ack);
+        //}
         System.arraycopy(buffer, ackbuf.length, buf, 0, length);
         //System.out.println("Packet revcd: " + new String(buffer));
         
         
+        if (ackno == packetno_){
+        	++packetno_;
+        	return in.getLength() - 2;
+        }
+        else
+        	return -1;
         
-        ++packetno_;
         
-        return in_.getLength() - 2;
 	}
     
     public int getFileLength() throws IOException {
         byte[] fullPacket = new byte[8+8+RDTServer.MAXFILENAMELENGTH];//8 for file length, 8 for file name char[] length, + the space for the filename. 
-        in_ = new DatagramPacket(fullPacket, fullPacket.length);
-        recvSocket_.receive(in_);//blocks until can receive
-        senderIP_ = in_.getAddress();
-        senderport_ = in_.getPort();
+        DatagramPacket in = new DatagramPacket(fullPacket, fullPacket.length);
+        recvSocket_.receive(in);//blocks until can receive
+        setSender(in.getAddress(), in.getPort());
         byte[] fileLen = new byte[8];
         byte[] fileNameLen = new byte[8];
         System.arraycopy(fullPacket, 0, fileLen, 0, 8);
@@ -72,5 +74,18 @@ public class RDTReceiver {
     
     public String getFileName(){
     	return fileName_;
+    }
+    
+    public int getAckNo(){
+    	return packetno_;
+    }
+    
+    public void close(){
+    	recvSocket_.close();
+    }
+    
+    private void setSender(InetAddress ip, int port){
+    	senderIP_ = ip;
+    	senderport_ = port;
     }
 }

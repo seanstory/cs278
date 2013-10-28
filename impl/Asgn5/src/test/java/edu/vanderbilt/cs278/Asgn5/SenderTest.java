@@ -31,14 +31,12 @@ public class SenderTest extends TestCase {
 		inetaddr_ = InetAddress.getLocalHost();
 		senderUnderTest_ = new RDTSender(inetaddr_, testPort_);
 		testText_ = new File(filePath_);
-		//FileOutputStream fos = new FileOutputStream(filePath_);
-		//fos.write("This is a test".getBytes());
-		//fos.close();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		testText_.delete();
+		senderUnderTest_.close();
 	}
 	
 	
@@ -60,6 +58,7 @@ public class SenderTest extends TestCase {
 		            packet = new DatagramPacket(Arrays.copyOfRange(packet.getData(), 0, 2), 2, inetaddr_, senderPort);
 		            sock.send(packet);
 		            assertEquals(0, ackno);
+		            sock.close();
 					
 				} catch (Exception e) {
 					fail(e.getMessage());
@@ -67,7 +66,7 @@ public class SenderTest extends TestCase {
 				}
 			}
 		}).start();
-		Thread.sleep(500); //let the other thread get going...
+		Thread.sleep(1000); //let the other thread get going...
 		assertTrue(senderUnderTest_.sendData(tmp.getBytes(), tmp.length()));//true now. Sent and received ack
 		assertEquals(1,senderUnderTest_.getPacketNo());
 		

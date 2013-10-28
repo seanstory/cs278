@@ -31,6 +31,8 @@ public class RDTClient {
         long fileLength = sendFile.length();
         
         DatagramPacket metricsData = sender.getMetricsDatagram(fileLength, fileName);
+        DatagramSocket sendSock = sender.getSendSocket();
+        sendSock.send(metricsData);
                 
         int totalSentBytes = 0;
         int readBytes;

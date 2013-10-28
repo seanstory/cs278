@@ -7,55 +7,44 @@ import java.nio.ByteBuffer;
 
 public class RDTSender {
 
-    private DatagramSocket sendSocket;
-    private DatagramPacket sendPacket;
-    private InetAddress serverIP;
-    private int serverPort;
-    private short packetno;
-    private String fileName_;
+    private DatagramSocket sendSocket_;
+    private InetAddress serverIP_;
+    private int serverPort_;
+    private short packetno_;
     
-	public RDTSender(InetAddress serverIP, int serverPort, String fileName) throws IOException {
-        sendSocket = new DatagramSocket();
-        sendSocket.setSoTimeout(10);
-        this.serverIP = serverIP;
-        this.serverPort = serverPort;
-        packetno = 0;
-        fileName_ = fileName;
+	public RDTSender(InetAddress serverIP, int serverPort) throws SocketException {
+        sendSocket_ = new DatagramSocket();
+        sendSocket_.setSoTimeout(10);
+        serverIP_ = serverIP;
+        serverPort_ = serverPort;
+        packetno_ = 0;
 	}
 
-	public void sendData(byte[] buf, int length) throws IOException {
-        makePacket(buf, length);
-        
-        boolean recvd = false;
+	public boolean sendData(byte[] buf, int length) throws IOException {
+        DatagramPacket packetToSend = makePacket(buf, length);
         byte[] ackbuf = new byte[2];
         DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length);
-        
-        //System.out.println("Packet says: " + new String(buf));
-        
-        while (!recvd) {
-            sendSocket.send(sendPacket);
-            
-            try {
-                sendSocket.receive(ack);
-                short ackno = ByteBuffer.wrap(ackbuf).getShort();
-                if (ackno == packetno) {
-                    recvd = true;
-                }
-                
-            } catch (Exception e) {
-                sendSocket.send(sendPacket);
+        sendSocket_.send(packetToSend);
+        try {
+            sendSocket_.receive(ack);
+            short ackno = ByteBuffer.wrap(ackbuf).getShort();
+            if (ackno == packetno_) {
+                ++packetno_;
+                return true;
             }
+            else
+            	return false;
+            
+        } catch (Exception e) {
+            return false;
         }
-        ++packetno;
-        
-        //System.out.println(new String(buf));
 	}
     
-    public void sendFileLength(long fileLength) throws IOException {
+    public DatagramPacket getMetricsDatagram(long fileLength, String fileName){
     	//initialize arrays for file length, file name length, and file name
     	byte[] fileLen = ByteBuffer.allocate(8).putLong(fileLength).array();
-    	byte[] fileNameLen = ByteBuffer.allocate(8).putLong(fileName_.length()).array();
-    	byte[] fName = fileName_.getBytes();
+    	byte[] fileNameLen = ByteBuffer.allocate(8).putLong(fileName.length()).array();
+    	byte[] fName = fileName.getBytes();
     	byte[] bytes = new byte[8+8+RDTServer.MAXFILENAMELENGTH];
     	
     	//copy all the above values into one array
@@ -64,16 +53,29 @@ public class RDTSender {
     	System.arraycopy(fName, 0, bytes, fileLen.length+fileNameLen.length, fName.length);
     	
     	//send the info!
-        DatagramPacket lengthPacket = new DatagramPacket(bytes ,bytes.length , serverIP, serverPort);
-        sendSocket.send(lengthPacket);
+        DatagramPacket metricsPacket = new DatagramPacket(bytes ,bytes.length , serverIP_, serverPort_);
+        return metricsPacket;
+        //sendSocket.send(lengthPacket);
 	}
     
-    private void makePacket(byte[] buf, int length) {
-        byte[] number = ByteBuffer.allocate(2).putShort(packetno).array();
+    public DatagramSocket getSendSocket(){
+    	return sendSocket_;
+    }
+    
+    protected int getPacketNo(){
+    	return packetno_;
+    }
+    
+    private DatagramPacket makePacket(byte[] buf, int length) {
+        byte[] number = ByteBuffer.allocate(2).putShort(packetno_).array();
         byte[] buffer = new byte[buf.length + 2];
         
         System.arraycopy(number, 0, buffer, 0, number.length);
         System.arraycopy(buf, 0, buffer, number.length, length);
-        sendPacket = new DatagramPacket(buffer, length + 2, serverIP, serverPort);
+        return  new DatagramPacket(buffer, length + 2, serverIP_, serverPort_);
+    }
+    
+    public void close(){
+    	sendSocket_.close();
     }
 }

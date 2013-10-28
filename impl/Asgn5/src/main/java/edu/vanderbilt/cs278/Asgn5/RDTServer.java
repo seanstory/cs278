@@ -52,12 +52,13 @@ public class RDTServer {
 			String outputMessage = "";
 			while(totalRecvBytes < fileLength) {
 				recvBytes = recver.recvData(buf, MAXBUFSIZE);
-				totalRecvBytes += recvBytes;
-				fileOut.write(buf, 0, recvBytes);
-	            double percent = (double) totalRecvBytes / fileLength * 100;
-	            deleteOldOutput(outputMessage.length());
-	            outputMessage = "Received " + percent + "% of file.";
-	            
+				if (recvBytes != -1){
+					totalRecvBytes += recvBytes;
+					fileOut.write(buf, 0, recvBytes);
+		            double percent = (double) totalRecvBytes / fileLength * 100;
+		            deleteOldOutput(outputMessage.length());
+		            outputMessage = "Received " + percent + "% of file.";
+				}
 	 	    }
 			fileOut.close();//make sure to close the file.
 			
