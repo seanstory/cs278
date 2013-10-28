@@ -26,11 +26,11 @@ public class RDTClient {
             System.exit(1);
         }
         
-        RDTSender sender = new RDTSender(serverIP, serverPort, fileName);
+        RDTSender sender = new RDTSender(serverIP, serverPort);
         
         long fileLength = sendFile.length();
         
-        sender.sendFileLength(fileLength);
+        DatagramPacket metricsData = sender.getMetricsDatagram(fileLength, fileName);
                 
         int totalSentBytes = 0;
         int readBytes;
@@ -40,7 +40,9 @@ public class RDTClient {
         while(totalSentBytes < fileLength) {
             readBytes = fileIn.read(buf, 0, MAXBUFSIZE);
             //System.out.println(new String(buf));
-            sender.sendData(buf, readBytes);
+            while ( ! sender.sendData(buf, readBytes)){
+            	//try until send is successful
+            }
             totalSentBytes += readBytes;
         }
        // System.out.println(totalSentBytes);
