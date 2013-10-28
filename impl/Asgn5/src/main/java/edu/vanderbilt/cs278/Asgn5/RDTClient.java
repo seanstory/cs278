@@ -5,29 +5,28 @@ import java.net.*;
 
 public class RDTClient {
 
-	/**
-	 * @param args
-	 * 
-	 */
-	public static final String FILENAME = "bigfile.txt";
-	public static final int MAXBUFSIZE = 10000;
+	//public static final String FILENAME = "bigfile.txt";
+	public static final int MAXBUFSIZE = RDTServer.MAXBUFSIZE;//how large the packets can be
 
 	public static void main(String[] args) throws Exception {
-		if (args.length != 2) {
-			System.err.println("usage:  <server_IP> <server_port>");
+		if (args.length != 3) {
+			System.err.println("usage:  <server_IP> <server_port> <file_to_send>");
 			System.exit(1);
 		}
 
 		InetAddress serverIP = InetAddress.getByName(args[0]);
 		int serverPort = Integer.parseInt(args[1]);
+		String fileName = args[2];
 			
-        RDTSender sender = new RDTSender(serverIP, serverPort);		
+       		
         
-        File sendFile = new File(FILENAME);
+        File sendFile = new File(fileName);
         if (!sendFile.exists()) {
-            System.out.println(FILENAME + " missing");
+            System.out.println(fileName + " missing");
             System.exit(1);
         }
+        
+        RDTSender sender = new RDTSender(serverIP, serverPort, fileName);
         
         long fileLength = sendFile.length();
         
@@ -35,7 +34,7 @@ public class RDTClient {
                 
         int totalSentBytes = 0;
         int readBytes;
-        byte[] buf = new byte[MAXBUFSIZE];
+        byte[] buf = new byte[MAXBUFSIZE+2];
         FileInputStream fileIn = new FileInputStream(sendFile);
         
         while(totalSentBytes < fileLength) {

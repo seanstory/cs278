@@ -6,8 +6,8 @@ import java.util.*;
 
 public class RDTServer {
 	
-	public static final String FILENAME = "bigfile_RDTreceived.txt";
-	public static final int MAXBUFSIZE = 10000;
+	public static final int MAXBUFSIZE = 10000; //dictates how large the packets can be
+	public static final int MAXFILENAMELENGTH = 30; //how many characters can go in a file name
 
 	public static void main(String[] args) throws Exception {
         if (args.length != 2) {
@@ -15,38 +15,57 @@ public class RDTServer {
 			System.exit(1);
 		}
 		
-		String serverIPPrefix = args[0];
-		int serverPort = Integer.parseInt(args[1]);
-		InetAddress serverIP = getIPwithPrefix(serverIPPrefix);
-		if (serverIP == null){
-			System.err.println("No matching IP");
-			System.exit(1);
-		}
-			
-		
-		RDTReceiver recver = new RDTReceiver(serverIP, serverPort);
-		
-		File recvFile = new File(FILENAME);
-		if (!recvFile.exists()) {
-			recvFile.createNewFile();
-	        System.out.println(FILENAME + " is created!");
-		}
-		
-		int fileLength = recver.getFileLength();
+        String input = "continue";
+        Scanner scanner = new Scanner(System.in);
+        while ( ! (input.equals("q") || input.equals("Q") ) ){
+        
+	        //find the matching system Inet Address
+			String serverIPPrefix = args[0]; 
+			int serverPort = Integer.parseInt(args[1]);
+			InetAddress serverIP = getIPwithPrefix(serverIPPrefix);
+			if (serverIP == null){
+				System.err.println("No matching IP");
+				System.exit(1);
+			}
 				
-		int totalRecvBytes = 0;
-		int recvBytes = 0;
-		byte [] buf = new byte[MAXBUFSIZE];
-		FileOutputStream fileOut = new FileOutputStream(recvFile);
-		
-		while(totalRecvBytes < fileLength) {
-			recvBytes = recver.recvData(buf, MAXBUFSIZE);
-			totalRecvBytes += recvBytes;
-			fileOut.write(buf, 0, recvBytes);
-            double per = (double) totalRecvBytes / fileLength * 100;
-            System.out.println("Received " + per + "% of file.");
- 	    }
-		fileOut.close();
+			//Attach a Receiver at the specified port number
+			RDTReceiver recver = new RDTReceiver(serverIP, serverPort);
+			System.out.println("Waiting for a client...");
+			int fileLength = recver.getFileLength(); 
+			String fileName = recver.getFileName();
+			System.out.println("Client Found: IP Address: "+recver.getClientIP());
+			
+			//create the file if it doesn't exist yet
+			File recvFile = new File("received_"+fileName);
+			if (!recvFile.exists()) {
+				recvFile.createNewFile();
+		        System.out.println("received_"+fileName + " is created!");
+			}
+			
+			//initialize variables for writing the file
+			int totalRecvBytes = 0;
+			int recvBytes = 0;
+			byte [] buf = new byte[MAXBUFSIZE];
+			FileOutputStream fileOut = new FileOutputStream(recvFile);
+			
+			//receive data from the RDTReceiver and write it, outputting progress
+			String outputMessage = "";
+			while(totalRecvBytes < fileLength) {
+				recvBytes = recver.recvData(buf, MAXBUFSIZE);
+				totalRecvBytes += recvBytes;
+				fileOut.write(buf, 0, recvBytes);
+	            double percent = (double) totalRecvBytes / fileLength * 100;
+	            deleteOldOutput(outputMessage.length());
+	            outputMessage = "Received " + percent + "% of file.";
+	            
+	 	    }
+			fileOut.close();//make sure to close the file.
+			
+			
+			System.out.println("Enter 'Q' to quit, anthing else to continue");
+			input = scanner.nextLine();
+        }
+        scanner.close();
         
 	}
 
@@ -66,6 +85,12 @@ public class RDTServer {
         	}
         }
         return null;
+	}
+	
+	private static void deleteOldOutput(int length){
+		while (length >0){
+			System.out.print("\b");
+		}
 	}
 
 }

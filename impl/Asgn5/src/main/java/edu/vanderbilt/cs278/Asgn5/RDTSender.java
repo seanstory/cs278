@@ -12,13 +12,15 @@ public class RDTSender {
     private InetAddress serverIP;
     private int serverPort;
     private short packetno;
+    private String fileName_;
     
-	public RDTSender(InetAddress serverIP, int serverPort) throws IOException {
+	public RDTSender(InetAddress serverIP, int serverPort, String fileName) throws IOException {
         sendSocket = new DatagramSocket();
         sendSocket.setSoTimeout(10);
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         packetno = 0;
+        fileName_ = fileName;
 	}
 
 	public void sendData(byte[] buf, int length) throws IOException {
@@ -50,8 +52,18 @@ public class RDTSender {
 	}
     
     public void sendFileLength(long fileLength) throws IOException {
-		// CS283 Lab 5 Assignment. Please implement
-    	byte[] bytes = ByteBuffer.allocate(8).putLong(fileLength).array();
+    	//initialize arrays for file length, file name length, and file name
+    	byte[] fileLen = ByteBuffer.allocate(8).putLong(fileLength).array();
+    	byte[] fileNameLen = ByteBuffer.allocate(8).putLong(fileName_.length()).array();
+    	byte[] fName = fileName_.getBytes();
+    	byte[] bytes = new byte[8+8+RDTServer.MAXFILENAMELENGTH];
+    	
+    	//copy all the above values into one array
+    	System.arraycopy(fileLen, 0, bytes, 0, fileLen.length);
+    	System.arraycopy(fileNameLen, 0, bytes, fileLen.length, fileNameLen.length);
+    	System.arraycopy(fName, 0, bytes, fileLen.length+fileNameLen.length, fName.length);
+    	
+    	//send the info!
         DatagramPacket lengthPacket = new DatagramPacket(bytes ,bytes.length , serverIP, serverPort);
         sendSocket.send(lengthPacket);
 	}
