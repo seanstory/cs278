@@ -24,10 +24,14 @@ public class RDTSender {
         DatagramPacket packetToSend = makePacket(buf, length);
         byte[] ackbuf = new byte[2];
         DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length);
+        //System.out.println("sending packet "+packetno_);
         sendSocket_.send(packetToSend);
+        
         try {
+        	//System.out.println("waiting for ack "+packetno_);
             sendSocket_.receive(ack);
             short ackno = ByteBuffer.wrap(ackbuf).getShort();
+            //System.out.println("received ack "+ackno);
             if (ackno == packetno_) {
                 ++packetno_;
                 return true;
@@ -36,7 +40,8 @@ public class RDTSender {
             	return false;
             
         } catch (Exception e) {
-            return false;
+            //System.out.println(e.getMessage());
+        	return false;
         }
 	}
     

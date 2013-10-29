@@ -17,6 +17,8 @@ public class RDTClient {
 		InetAddress serverIP = InetAddress.getByName(args[0]);
 		int serverPort = Integer.parseInt(args[1]);
 		String fileName = args[2];
+		File runningFile = new File(".client_"+serverPort+"_running");
+		runningFile.createNewFile();
 			
        		
         
@@ -45,11 +47,17 @@ public class RDTClient {
             while ( ! sender.sendData(buf, readBytes)){
             	//try until send is successful
             }
+            //System.out.println("sent "+sender.getPacketNo());
             totalSentBytes += readBytes;
         }
        // System.out.println(totalSentBytes);
         fileIn.close();
+        runningFile.delete();
 
+	}
+	
+	public static boolean isRunning(int portnum){
+		return new File(".client_"+portnum+"_running").exists();
 	}
 
 }

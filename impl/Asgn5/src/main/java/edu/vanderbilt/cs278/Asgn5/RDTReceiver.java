@@ -28,14 +28,16 @@ public class RDTReceiver {
         
         //wait for - and then receive and store - the next packet
        // while (ackno != packetno_) {
+        //System.out.println("Waiting to receive "+packetno_);
         recvSocket_.receive(in);
         setSender(in.getAddress(), in.getPort());
         System.arraycopy(buffer, 0, ackbuf, 0, ackbuf.length);
         short ackno = ByteBuffer.wrap(ackbuf).getShort();//extract the value from the 2 bytes.
-        
+        //System.out.println("Received ack "+ackno);
         //send an ack no matter what. 
         DatagramPacket ack = new DatagramPacket(ackbuf, ackbuf.length, senderIP_, senderport_);
         recvSocket_.send(ack);
+        //System.out.println("Sent ack "+ackno);
         //}
         System.arraycopy(buffer, ackbuf.length, buf, 0, length);
         //System.out.println("Packet revcd: " + new String(buffer));

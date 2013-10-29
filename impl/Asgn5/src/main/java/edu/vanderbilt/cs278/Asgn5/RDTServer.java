@@ -17,19 +17,24 @@ public class RDTServer {
 		
         String input = "continue";
         Scanner scanner = new Scanner(System.in);
+        
+        
         while ( ! (input.equals("q") || input.equals("Q") ) ){
         
-	        //find the matching system Inet Address
-			String serverIPPrefix = args[0]; 
-			int serverPort = Integer.parseInt(args[1]);
-			InetAddress serverIP = getIPwithPrefix(serverIPPrefix);
-			if (serverIP == null){
-				System.err.println("No matching IP");
-				System.exit(1);
-			}
-				
-			//Attach a Receiver at the specified port number
-			RDTReceiver recver = new RDTReceiver(serverIP, serverPort);
+        	//find the matching system Inet Address
+    		String serverIPPrefix = args[0]; 
+    		int serverPort = Integer.parseInt(args[1]);
+    		InetAddress serverIP = getIPwithPrefix(serverIPPrefix);
+    		if (serverIP == null){
+    			System.err.println("No matching IP");
+    			System.exit(1);
+    		}
+    		File runningFile = new File(".server_"+serverPort+"_running");
+    		runningFile.createNewFile();
+    		
+    			
+    		//Attach a Receiver at the specified port number
+    		RDTReceiver recver = new RDTReceiver(serverIP, serverPort);
 			System.out.println("Waiting for a client...");
 			int fileLength = recver.getFileLength(); 
 			String fileName = recver.getFileName();
@@ -53,17 +58,21 @@ public class RDTServer {
 			while(totalRecvBytes < fileLength) {
 				recvBytes = recver.recvData(buf, MAXBUFSIZE);
 				if (recvBytes != -1){
+					//debug
+					//System.out.println("received "+recver.getAckNo());
 					totalRecvBytes += recvBytes;
 					fileOut.write(buf, 0, recvBytes);
 		            double percent = (double) totalRecvBytes / fileLength * 100;
 		            deleteOldOutput(outputMessage.length());
 		            outputMessage = "Received " + percent + "% of file.";
+		            System.out.print(outputMessage);
 				}
 	 	    }
 			fileOut.close();//make sure to close the file.
+			recver.close();
+			runningFile.delete();
 			
-			
-			System.out.println("Enter 'Q' to quit, anthing else to continue");
+			System.out.println("\nEnter 'Q' to quit, anthing else to continue");
 			input = scanner.nextLine();
         }
         scanner.close();
@@ -91,7 +100,12 @@ public class RDTServer {
 	private static void deleteOldOutput(int length){
 		while (length >0){
 			System.out.print("\b");
+			length --;
 		}
+	}
+	
+	public static boolean isRunning(int portnum){
+		return new File(".server_"+portnum+"_running").exists();
 	}
 
 }
