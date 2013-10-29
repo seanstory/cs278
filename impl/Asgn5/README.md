@@ -17,13 +17,13 @@ sender resent the packet even though it was indeed successfully received.
 
 To run the assignment, please do:
 
-mvm clean package
-vagrant up
-vagrant ssh
-java -cp shared/target/RDT-App-1.0-SNAPSHOT.jar edu.vanderbilt.cs278.Asgn5.RDTServer 192.168.50.4 8888
+mvm clean package   
+vagrant up   
+vagrant ssh   
+java -cp shared/target/RDT-App-1.0-SNAPSHOT.jar edu.vanderbilt.cs278.Asgn5.RDTServer 192.168.50.4 8888   
 
 
-(in another window, not in vagrant)
-java -cp target/RDT-Snapshot.jar edu.vanderbilt.cs278.Asgn5.RDTClient 192.168.50.4 8888 bigfile.txt
+(in another window, not in vagrant)   
+java -cp target/RDT-Snapshot.jar edu.vanderbilt.cs278.Asgn5.RDTClient 192.168.50.4 8888 bigfile.txt   
 
 
